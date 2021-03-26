@@ -28,10 +28,17 @@ df.head()
 ```
 
 ```python
-plt.plot(df.index, df.cumsum().Stories.values)
-plt.title("Burn-up")
-plt.xlabel("Date")
-plt.ylabel("Stories");
+def plot_burn_up():
+    _, ax = plt.subplots()
+    ax.plot(df.index, df.cumsum().Stories)
+    ax.set_title("Burn-up")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Stories")
+    return ax
+```
+
+```python
+plot_burn_up();
 ```
 
 ## The model
@@ -53,18 +60,27 @@ with m:
 ```
 
 ```python
-az.plot_ppc(az.from_pymc3(prior=prior_pc, model=m), group="prior", num_pp_samples=NROF_SAMPLE_LINES)
-plt.title("Expected stories per day before seeing any data")
-plt.xlabel("Stories per Day")
-plt.ylabel("Probability");
+def plot_stories_per_day(*, prior=None, posterior_predictive=None, group="posterior"):
+    ax = az.plot_ppc(az.from_pymc3(prior=prior_pc, model=m), group="prior", num_pp_samples=NROF_SAMPLE_LINES)
+    ax.set_xlabel("Stories per Day")
+    ax.set_ylabel("Probability")
+    return ax
 ```
 
 ```python
-plt.plot(df.index, prior_pc["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
-plt.plot(df.index, df.cumsum().Stories)
-plt.title("Expected burn-up before seeing any data")
-plt.xlabel("Date")
-plt.ylabel("Stories");
+ax = plot_stories_per_day(prior=prior_pc, group="prior")
+ax.set_title("Expected stories per day before seeing any data");
+```
+
+```python
+def plot_burn_up_ppc(ax, ppc):
+    return ax.plot(df.index, ppc["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
+```
+
+```python
+ax = plot_burn_up()
+ax.set_title("Expected burn-up before seeing any data")
+plot_burn_up_ppc(ax, prior_pc);
 ```
 
 ## Inferencing
@@ -86,18 +102,14 @@ with m:
 ```
 
 ```python
-az.plot_ppc(az.from_pymc3(posterior_predictive=post_pc, model=m), num_pp_samples=NROF_SAMPLE_LINES)
-plt.title("Expected stories per day after seeing the data")
-plt.xlabel("Stories per Day")
-plt.ylabel("Probability");
+ax = plot_stories_per_day(prior=post_pc)
+ax.set_title("Expected stories per day after seeing any data");
 ```
 
 ```python
-plt.plot(df.index, post_pc["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
-plt.plot(df.index, df.cumsum().Stories)
-plt.title("Expected burn-up after seeing the data")
-plt.xlabel("Date")
-plt.ylabel("Stories");
+ax = plot_burn_up()
+ax.set_title("Expected burn-up after seeing the data")
+plot_burn_up_ppc(ax, post_pc);
 ```
 
 ## Predictions
@@ -111,57 +123,73 @@ with m:
 ```
 
 ```python
-x = np.arange(NROF_DAYS)
-plt.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
-plt.title("Expected burn-up for future stories")
-plt.xlabel("Days")
-plt.ylabel("Stories");
+def plot_expected_burn_up():
+    _, ax = plt.subplots()
+    ax.plot(np.arange(NROF_DAYS),
+            post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0),
+            color="black", alpha=.1)
+    ax.set_title("Expected burn-up for future stories")
+    ax.set_xlabel("Days")
+    ax.set_ylabel("Stories")
+    return ax
+```
+
+```python
+ax = plot_expected_burn_up()
 ```
 
 ## How many stories will be done in X days?
 
 ```python
-plt.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
-plt.axvline(NROF_DAYS)
-plt.title("Expected burn-up for future stories")
-plt.xlabel("Days")
-plt.ylabel("Stories");
+ax = plot_expected_burn_up()
+ax.axvline(NROF_DAYS);
 ```
 
 ```python
-samples = post_pred["count"].cumsum(axis=1)[:,NROF_DAYS-1]  # of how many stories done
+stories_samples = post_pred["count"].cumsum(axis=1)[:,NROF_DAYS-1]  # of how many stories done
 ```
 
 ```python
-az.plot_kde(samples, quantiles=QUANTILES/100)
-plt.title("Predicted number of stories")
-plt.xlabel("Stories per Day")
-plt.ylabel("Probability");
+def plot_prediction(samples):
+    ax = az.plot_kde(samples, quantiles=QUANTILES/100)
+    ax.set_ylabel("Probability")
+    return ax
 ```
 
 ```python
-pd.DataFrame({"stories": np.percentile(samples, QUANTILES).astype(int)}, index=[f"{100 - q}%" for q in QUANTILES])
+ax = plot_prediction(stories_samples)
+ax.set_title("Predicted number of stories")
+ax.set_xlabel("Stories");
+```
+
+```python
+def get_quantiles(name, samples):
+    return pd.DataFrame({name: np.percentile(samples, QUANTILES).astype(int)},
+                        index=[f"{100 - q}%" for q in QUANTILES])
+```
+
+```python
+get_quantiles("stories", stories_samples)
 ```
 
 ## How many days will be needed for X stories?
 
 ```python
-plt.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
-plt.axhline(NROF_STORIES);
+ax = plot_expected_burn_up()
+ax.axhline(NROF_STORIES);
 ```
 
 ```python
-samples = (post_pred["count"].cumsum(axis=1) < NROF_STORIES).sum(axis=1) + 1  # of nrof days until the stories are done
+days_samples = (post_pred["count"].cumsum(axis=1) < NROF_STORIES).sum(axis=1) + 1  # of nrof days until the stories are done
 # TODO: assert that all stories are done in NROF_DAYS, otherwise the predicted number of days will be off
 ```
 
 ```python
-az.plot_kde(samples, quantiles=QUANTILES/100)
-plt.title("Predicted number of days")
-plt.xlabel("Days")
-plt.ylabel("Probability");
+ax = plot_prediction(days_samples)
+ax.set_title("Predicted number of days")
+ax.set_xlabel("Days");
 ```
 
 ```python
-pd.DataFrame({"days": np.percentile(samples, QUANTILES)}, index=[f"{100 - q}%" for q in QUANTILES])
+get_quantiles("days", days_samples)
 ```
