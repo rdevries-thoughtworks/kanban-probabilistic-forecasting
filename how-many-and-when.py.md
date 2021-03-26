@@ -38,7 +38,7 @@ def plot_burn_up():
 ```
 
 ```python
-plot_burn_up();
+ax = plot_burn_up()
 ```
 
 ## The model
@@ -69,18 +69,21 @@ def plot_stories_per_day(*, prior=None, posterior_predictive=None, group="poster
 
 ```python
 ax = plot_stories_per_day(prior=prior_pc, group="prior")
-ax.set_title("Expected stories per day before seeing any data");
+ax.set_title("Expected stories per day before seeing any data")
+None
 ```
 
 ```python
-def plot_burn_up_ppc(ax, ppc):
-    return ax.plot(df.index, ppc["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
+def plot_burn_up_ppc(ppc):
+    ax = plot_burn_up()
+    ax.plot(df.index, ppc["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0), color="black", alpha=.1)
+    return ax
 ```
 
 ```python
-ax = plot_burn_up()
+ax = plot_burn_up_ppc(prior_pc)
 ax.set_title("Expected burn-up before seeing any data")
-plot_burn_up_ppc(ax, prior_pc);
+None
 ```
 
 ## Inferencing
@@ -103,13 +106,14 @@ with m:
 
 ```python
 ax = plot_stories_per_day(prior=post_pc)
-ax.set_title("Expected stories per day after seeing any data");
+ax.set_title("Expected stories per day after seeing any data")
+None
 ```
 
 ```python
-ax = plot_burn_up()
+ax = plot_burn_up_ppc(post_pc)
 ax.set_title("Expected burn-up after seeing the data")
-plot_burn_up_ppc(ax, post_pc);
+None
 ```
 
 ## Predictions
@@ -142,7 +146,8 @@ ax = plot_expected_burn_up()
 
 ```python
 ax = plot_expected_burn_up()
-ax.axvline(NROF_DAYS);
+ax.axvline(NROF_DAYS)
+None
 ```
 
 ```python
@@ -159,7 +164,8 @@ def plot_prediction(samples):
 ```python
 ax = plot_prediction(stories_samples)
 ax.set_title("Predicted number of stories")
-ax.set_xlabel("Stories");
+ax.set_xlabel("Stories")
+None
 ```
 
 ```python
@@ -176,7 +182,8 @@ get_quantiles("stories", stories_samples)
 
 ```python
 ax = plot_expected_burn_up()
-ax.axhline(NROF_STORIES);
+ax.axhline(NROF_STORIES)
+None
 ```
 
 ```python
@@ -187,7 +194,8 @@ assert np.all(days_samples <= NROF_DAYS), f"Some scenarios need more than {NROF_
 ```python
 ax = plot_prediction(days_samples)
 ax.set_title("Predicted number of days")
-ax.set_xlabel("Days");
+ax.set_xlabel("Days")
+None
 ```
 
 ```python
