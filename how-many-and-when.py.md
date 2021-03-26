@@ -181,7 +181,7 @@ ax.axhline(NROF_STORIES);
 
 ```python
 days_samples = (post_pred["count"].cumsum(axis=1) < NROF_STORIES).sum(axis=1) + 1  # of nrof days until the stories are done
-# TODO: assert that all stories are done in NROF_DAYS, otherwise the predicted number of days will be off
+assert np.all(days_samples <= NROF_DAYS), f"Some scenarios need more than {NROF_DAYS} days"
 ```
 
 ```python
