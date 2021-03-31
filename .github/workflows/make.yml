@@ -35,4 +35,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          external_repository: rdevries-thoughtworks/rdevries-thoughtworks.github.io
           publish_dir: ./public
