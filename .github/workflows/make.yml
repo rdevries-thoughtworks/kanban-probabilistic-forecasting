@@ -26,14 +26,6 @@ jobs:
           ./do init
           ./do make
 
-      - name: Upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: notebook
-          path: |
-            how-many-and-when.html
-            how-many-and-when.ipynb
-
       - name: Select
         run: |
           mkdir public
