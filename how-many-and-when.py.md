@@ -15,7 +15,7 @@ NROF_SAMPLES = 1000  # ... to take for probability distributions
 NROF_SAMPLE_LINES = 50  # ... to plot for probability distributions
 NROF_DAYS = 400  # ... to calculate the expected number of stories for
 NROF_STORIES = 100  # ... to calculate the expected number of days for
-QUANTILES = np.array([5, 10, 20, 30, 50])  # ... to show the probability of
+PERCENTILES = np.array([50, 70, 80, 90, 95, 99])  # ... to show the probability of
 ```
 
 ## Historical data
@@ -155,27 +155,29 @@ stories_samples = post_pred["count"].cumsum(axis=1)[:,NROF_DAYS-1]  # of how man
 ```
 
 ```python
-def plot_prediction(samples):
-    ax = az.plot_kde(samples, quantiles=QUANTILES/100)
+def plot_prediction(samples, from_top=False):
+    percentiles = 100 - PERCENTILES if from_top else PERCENTILES
+    ax = az.plot_kde(samples, quantiles=percentiles/100)
     ax.set_ylabel("Probability")
     return ax
 ```
 
 ```python
-ax = plot_prediction(stories_samples)
+ax = plot_prediction(stories_samples, from_top=True)
 ax.set_title("Predicted number of stories")
 ax.set_xlabel("Stories")
 None
 ```
 
 ```python
-def get_quantiles(name, samples):
-    return pd.DataFrame({name: np.percentile(samples, QUANTILES).astype(int)},
-                        index=[f"{100 - q}%" for q in QUANTILES])
+def get_quantiles(name, samples, from_top=False):
+    percentiles = 100 - PERCENTILES if from_top else PERCENTILES
+    return pd.DataFrame({name: np.percentile(samples, percentiles).astype(int)},
+                        index=[f"{q}%" for q in PERCENTILES])
 ```
 
 ```python
-get_quantiles("stories", stories_samples)
+get_quantiles("stories", stories_samples, from_top=True)
 ```
 
 ## How many days will be needed for X stories?
