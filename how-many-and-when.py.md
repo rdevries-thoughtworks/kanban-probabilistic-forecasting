@@ -127,19 +127,25 @@ with m:
 ```
 
 ```python
-def plot_expected_burn_up():
+def plot_expected_burn_up(percentile=None):
     _, ax = plt.subplots()
-    ax.plot(np.arange(NROF_DAYS),
-            post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0),
+    x = np.arange(NROF_DAYS)
+    ax.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0),
             color="black", alpha=.1)
     ax.set_title("Expected burn-up for future stories")
     ax.set_xlabel("Days")
     ax.set_ylabel("Stories")
+    if percentile:
+        ax.plot(x, np.percentile(post_pred["count"].cumsum(axis=1), 100-percentile, axis=0))
     return ax
 ```
 
 ```python
 ax = plot_expected_burn_up()
+```
+
+```python
+ax = plot_expected_burn_up(percentile=90)
 ```
 
 ## How many stories will be done in X days?
