@@ -16,6 +16,7 @@ NROF_SAMPLE_LINES = 50  # ... to plot for probability distributions
 NROF_DAYS = 400  # ... to calculate the expected number of stories for
 NROF_STORIES = 100  # ... to calculate the expected number of days for
 PERCENTILES = np.array([50, 70, 80, 90, 95, 99])  # ... to show the probability of
+PLOT_PERCENTILE = 90
 ```
 
 ## Historical data
@@ -145,7 +146,7 @@ ax = plot_expected_burn_up()
 ```
 
 ```python
-ax = plot_expected_burn_up(percentile=90)
+ax = plot_expected_burn_up(percentile=PLOT_PERCENTILE)
 ```
 
 ## How many stories will be done in X days?
