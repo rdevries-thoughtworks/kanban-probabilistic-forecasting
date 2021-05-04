@@ -28,7 +28,7 @@ PLOT_PERCENTILE = 90
 df = pd.read_csv(CSV_FILE, usecols=["Done"], parse_dates=["Done"]).dropna()
 df = df.rename(columns={"Done": "Date"}).set_index("Date").assign(Stories=1)
 df = df.resample("D").count()
-df = df.reindex(pd.DatetimeIndex(pd.date_range(start=START_DATE, end=END_DATE, freq="D"))).fillna(0)
+df = df.reindex(pd.date_range(start=START_DATE, end=END_DATE, freq="D")).fillna(0)
 df.head()
 ```
 
@@ -132,13 +132,18 @@ with m:
 ```
 
 ```python
+def get_date_range():
+    return pd.date_range(start=END_DATE, periods=NROF_DAYS + 1, freq="D")[1:]
+```
+
+```python
 def plot_expected_burn_up(percentile=None):
     _, ax = plt.subplots()
-    x = np.arange(NROF_DAYS)
+    x = get_date_range()
     ax.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0),
             color="black", alpha=.1)
     ax.set_title("Expected burn-up for future stories")
-    ax.set_xlabel("Days")
+    ax.set_xlabel("Date")
     ax.set_ylabel("Stories")
     if percentile:
         ax.plot(x, np.percentile(post_pred["count"].cumsum(axis=1), 100-percentile, axis=0))
@@ -157,7 +162,7 @@ ax = plot_expected_burn_up(percentile=PLOT_PERCENTILE)
 
 ```python
 ax = plot_expected_burn_up()
-ax.axvline(NROF_DAYS)
+ax.axvline(get_date_range()[-1])
 None
 ```
 
