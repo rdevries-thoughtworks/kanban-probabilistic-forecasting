@@ -11,6 +11,8 @@ az.style.use("arviz-darkgrid")
 ## Change these constants to personalize your results
 
 ```python
+START_DATE = '2018-07-12'  # ... of measured throughput
+END_DATE = '2019-01-30'  # ... of measured throughput
 NROF_SAMPLES = 1000  # ... to take for probability distributions
 NROF_SAMPLE_LINES = 50  # ... to plot for probability distributions
 NROF_DAYS = 400  # ... to calculate the expected number of stories for
@@ -25,6 +27,7 @@ PLOT_PERCENTILE = 90
 df = pd.read_csv('data.csv', usecols=['Done'], parse_dates=['Done']).dropna()
 df = df.rename(columns={"Done": "Date"}).set_index("Date").assign(Stories=1)
 df = df.resample("D").count()
+df = df.reindex(pd.DatetimeIndex(pd.date_range(start=START_DATE, end=END_DATE, freq="D"))).fillna(0)
 df.head()
 ```
 
