@@ -195,6 +195,10 @@ def get_quantiles(name, samples, from_top=False):
 ```
 
 ```python
+np.mean(stories_samples)  # expected nrof stories
+```
+
+```python
 get_quantiles("stories", stories_samples, from_top=True)
 ```
 
@@ -223,6 +227,10 @@ ax = plot_prediction(days_samples, cumulative=True)
 ax.set_title("Predicted number of days (cumulative)")
 ax.set_xlabel("Days")
 None
+```
+
+```python
+np.mean(days_samples)  # expected nrof days
 ```
 
 ```python
