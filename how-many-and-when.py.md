@@ -145,8 +145,10 @@ def plot_expected_burn_up(percentile=None):
     ax.set_title("Expected burn-up for future stories")
     ax.set_xlabel("Date")
     ax.set_ylabel("Stories")
+    ax.plot(x, np.mean(post_pred["count"].cumsum(axis=1), axis=0), label="expected")
     if percentile:
-        ax.plot(x, np.percentile(post_pred["count"].cumsum(axis=1), 100-percentile, axis=0))
+        ax.plot(x, np.percentile(post_pred["count"].cumsum(axis=1), 100-percentile, axis=0), label=f"{percentile}th percentile")
+    ax.legend()
     return ax
 ```
 
