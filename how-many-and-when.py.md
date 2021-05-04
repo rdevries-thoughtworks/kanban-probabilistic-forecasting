@@ -220,6 +220,7 @@ None
 ```python
 days_samples = (post_pred["count"].cumsum(axis=1) < NROF_STORIES).sum(axis=1) + 1  # of nrof days until the stories are done
 assert np.all(days_samples <= NROF_DAYS), f"Some scenarios need more than {NROF_DAYS} days"
+dates_samples = pd.to_timedelta(days_samples, "D") + get_date_range()[-1]
 ```
 
 ```python
@@ -238,6 +239,10 @@ None
 
 ```python
 np.mean(days_samples)  # expected nrof days
+```
+
+```python
+(get_date_range()[-1] + pd.to_timedelta(np.mean(days_samples), "D")).strftime("%Y-%m-%d")
 ```
 
 ```python
