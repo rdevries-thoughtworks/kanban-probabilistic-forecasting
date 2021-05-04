@@ -241,5 +241,7 @@ np.mean(days_samples)  # expected nrof days
 ```
 
 ```python
-get_quantiles("days", days_samples)
+_df = get_quantiles("days", days_samples)
+_df["date"] = pd.to_timedelta(_df.days, "D") + get_date_range()[-1]
+_df
 ```
