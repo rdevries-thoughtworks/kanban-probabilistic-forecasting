@@ -166,9 +166,9 @@ stories_samples = post_pred["count"].cumsum(axis=1)[:,NROF_DAYS-1]  # of how man
 ```
 
 ```python
-def plot_prediction(samples, from_top=False):
+def plot_prediction(samples, from_top=False, cumulative=False):
     percentiles = 100 - PERCENTILES if from_top else PERCENTILES
-    ax = az.plot_kde(samples, quantiles=percentiles/100)
+    ax = az.plot_kde(samples, quantiles=percentiles/100, cumulative=cumulative)
     ax.set_ylabel("Probability")
     return ax
 ```
@@ -176,6 +176,13 @@ def plot_prediction(samples, from_top=False):
 ```python
 ax = plot_prediction(stories_samples, from_top=True)
 ax.set_title("Predicted number of stories")
+ax.set_xlabel("Stories")
+None
+```
+
+```python
+ax = plot_prediction(stories_samples, from_top=True, cumulative=True)
+ax.set_title("Predicted number of stories (cumulative)")
 ax.set_xlabel("Stories")
 None
 ```
@@ -207,6 +214,13 @@ assert np.all(days_samples <= NROF_DAYS), f"Some scenarios need more than {NROF_
 ```python
 ax = plot_prediction(days_samples)
 ax.set_title("Predicted number of days")
+ax.set_xlabel("Days")
+None
+```
+
+```python
+ax = plot_prediction(days_samples, cumulative=True)
+ax.set_title("Predicted number of days (cumulative)")
 ax.set_xlabel("Days")
 None
 ```
