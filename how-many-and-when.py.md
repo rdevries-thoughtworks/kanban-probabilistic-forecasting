@@ -17,7 +17,7 @@ NROF_SAMPLES = 1000  # ... to take for probability distributions
 NROF_SAMPLE_LINES = 50  # ... to plot for probability distributions
 NROF_DAYS = 400  # ... to calculate the expected number of stories for
 NROF_STORIES = 100  # ... to calculate the expected number of days for
-PERCENTILES = np.array([50, 70, 80, 90, 95, 99])  # ... to show the probability of
+PERCENTILES = np.array([50, 70, 80, 85, 90, 95, 99])  # ... to show the probability of
 PLOT_PERCENTILE = 90
 ```
 
