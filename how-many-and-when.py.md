@@ -133,13 +133,13 @@ with m:
 
 ```python
 def get_date_range():
-    return pd.date_range(start=END_DATE, periods=NROF_DAYS + 1, freq="D")[1:]
+    return pd.date_range(start=END_DATE, periods=NROF_DAYS + 1, freq="D")  # ... including day 0
 ```
 
 ```python
 def plot_expected_burn_up(percentile=None):
     _, ax = plt.subplots()
-    x = get_date_range()
+    x = get_date_range()[1:]
     ax.plot(x, post_pred["count"][:NROF_SAMPLE_LINES,:].T.cumsum(axis=0),
             color="black", alpha=.1)
     ax.set_title("Expected burn-up for future stories")
@@ -220,7 +220,7 @@ None
 ```python
 days_samples = (post_pred["count"].cumsum(axis=1) < NROF_STORIES).sum(axis=1) + 1  # of nrof days until the stories are done
 assert np.all(days_samples <= NROF_DAYS), f"Some scenarios need more than {NROF_DAYS} days"
-dates_samples = pd.to_timedelta(days_samples, "D") + get_date_range()[-1]
+dates_samples = pd.to_timedelta(days_samples, "D") + get_date_range()[0]
 ```
 
 ```python
@@ -242,11 +242,11 @@ np.mean(days_samples)  # expected nrof days
 ```
 
 ```python
-(get_date_range()[-1] + pd.to_timedelta(np.mean(days_samples), "D")).strftime("%Y-%m-%d")
+(get_date_range()[0] + pd.to_timedelta(np.mean(days_samples), "D")).strftime("%Y-%m-%d")
 ```
 
 ```python
 _df = get_quantiles("days", days_samples)
-_df["date"] = pd.to_timedelta(_df.days, "D") + get_date_range()[-1]
+_df["date"] = pd.to_timedelta(_df.days, "D") + get_date_range()[0]
 _df
 ```
